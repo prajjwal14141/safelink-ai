@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from utils import clean_url, getTokens 
 import random
 import re
 import math
@@ -9,45 +10,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import joblib
 
-def clean_url(url):
-    """
-    Cleans a URL by removing protocol (http/https), 'www.',
-    and trailing slashes.
-    """
-    # Remove protocol
-    url = re.sub(r'^(https?|ftp)://', '', url)
-    # Remove 'www.'
-    url = re.sub(r'^www\.', '', url)
-    # Remove trailing slash
-    url = re.sub(r'/$', '', url)
-    return url
-
-def getTokens(input):
-    """
-    A custom tokenizer that splits URLs by '/', '-', and '.'
-    """
-    # Use the raw string, not the encoded version
-    tokensBySlash = str(input).split('/')
-    allTokens = []
-    for i in tokensBySlash:
-        tokens = str(i).split('-')
-        tokensByDot = []
-        for j in range(0, len(tokens)):
-            tempTokens = str(tokens[j]).split('.')
-            tokensByDot = tokensByDot + tempTokens
-        allTokens = allTokens + tokens + tokensByDot
-    
-    allTokens = list(set(allTokens))
-    # Remove common, non-descriptive tokens
-    if 'com' in allTokens:
-        allTokens.remove('com')
-    if 'www' in allTokens:
-        allTokens.remove('www')
-    if 'http' in allTokens:
-        allTokens.remove('http')
-    if 'https' in allTokens:
-        allTokens.remove('https')
-    return allTokens
 
 def TL():
     """Trains the model and saves it to disk."""
