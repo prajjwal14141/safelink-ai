@@ -1,4 +1,4 @@
-const API_ENDPOINT = "http://127.0.0.1:5000/analyze";
+const API_ENDPOINT = "https://safelink-ai.onrender.com/analyze";
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   
