@@ -1,0 +1,9 @@
+wheel 
+scikit-learn 
+pandas 
+joblib 
+numpy 
+Flask 
+flask-cors
+requests
+firebase-admin

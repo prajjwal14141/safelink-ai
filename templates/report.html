@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeLink AI - Report Incorrect Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styling & Fonts */
+        :root { /* Using variables from index.html */
+            --bg-primary: #0a0f1f; --bg-secondary: #10172d; --bg-card: rgba(18, 26, 49, 0.6);
+            --border-color: rgba(56, 73, 117, 0.2); --text-primary: #e0e8f9; --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8; --accent-cyan: #2dd4bf; --accent-red: #fb7185; --accent-orange: #fb923c;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary);
+            overscroll-behavior: none;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(rgba(255, 255, 255, 0.03) .5px, transparent .5px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) .5px, transparent .5px);
+            background-size: 1px 1px, 1px 1px, 30px 30px, 30px 30px;
+        }
+        h1, h2, h3, h4, h5, h6, button, label { font-family: 'Poppins', sans-serif; letter-spacing: -0.02em; } /* Added label */
+        .glass-effect {
+            background: var(--bg-card); backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%); border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .spinner { border-color: rgba(255, 255, 255, 0.3); border-top-color: var(--accent-blue); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.7s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-primary { /* Copied from index.html */
+            background: linear-gradient(to right, #0ea5e9, var(--accent-blue)); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); color: white; font-weight: 600;
+        }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(56, 189, 248, 0.3); }
+        .btn-primary:active { transform: translateY(-1px) scale(0.99); box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); }
+        .input-enhanced, select, textarea { /* Apply to all form elements */
+             background-color: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-color); color: var(--text-primary); transition: all 0.3s ease;
+             border-radius: 0.5rem; /* rounded-lg */
+             padding: 0.75rem 1rem; /* Consistent padding */
+        }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; }
+        .input-enhanced::placeholder, textarea::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        .input-enhanced:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); background-color: rgba(30, 41, 59, 0.9); }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen flex flex-col antialiased">
+
+    <header class="sticky top-0 z-50 glass-effect border-b border-[var(--border-color)] shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+             <a href="/" class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                 <svg class="w-7 h-7 text-[var(--accent-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-[var(--accent-cyan)]">Safe</span>Link <span class="font-light text-gray-400 text-lg">AI</span>
+            </a>
+            <div class="space-x-1 sm:space-x-2">
+                 <a href="/" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">Detector</a>
+                 <a href="/how-it-works" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">How It Works</a>
+                 <a href="/expander" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">URL Expander</a>
+                 <a href="/history" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">History</a>
+                 <a href="/report" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600/80 hover:bg-blue-600 transition-colors duration-200 shadow">Report Error</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-16 sm:py-24 flex-grow">
+        <div class="max-w-2xl mx-auto fade-in">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-white text-center mb-4 tracking-tight">Report Incorrect Prediction</h1>
+            <p class="text-base sm:text-lg text-gray-400 text-center mb-10">
+                
+                Your feedback helps improve SafeLink AI. If our model made a mistake, please let us know.
+                            {Under development}
+            </p>
+
+
+            <!-- Report Form Container -->
+            <div class="glass-effect p-6 sm:p-8 rounded-xl shadow-xl">
+                <form id="report-form" class="space-y-6">
+                    <div>
+                        <label for="report-url" class="block text-sm font-semibold text-gray-300 mb-1.5">URL You Analyzed *</label>
+                        <input type="text" id="report-url" name="url"
+                               class="input-enhanced w-full shadow-inner"
+                               placeholder="Paste the full URL here" required>
+                    </div>
+
+                    <div>
+                        <label for="report-feedback" class="block text-sm font-semibold text-gray-300 mb-1.5">Nature of Error *</label>
+                        <select id="report-feedback" name="feedback"
+                                class="input-enhanced w-full" required>
+                            <option value="" disabled selected>Select the type of error...</option>
+                            <option value="should_be_good">AI marked as 'Malicious', but it's actually SAFE</option>
+                            <option value="should_be_bad">AI marked as 'Safe', but it's actually MALICIOUS</option>
+                        </select>
+                    </div>
+
+                     <div>
+                        <label for="report-comments" class="block text-sm font-semibold text-gray-300 mb-1.5">Additional Comments (Optional)</label>
+                        <textarea id="report-comments" name="comments" rows="4"
+                                  class="input-enhanced w-full shadow-inner resize-none"
+                                  placeholder="Provide any details about why you believe the prediction was incorrect (e.g., 'This is my company's official website')."></textarea>
+                    </div>
+
+                    <button type="submit" id="submit-button"
+                            class="btn-primary w-full flex items-center justify-center px-6 py-3 sm:py-4 rounded-lg text-base sm:text-lg">
+                        <div id="spinner" class="spinner w-5 h-5 border-2 rounded-full mr-3 hidden"></div>
+                        <span id="button-text">Submit Feedback</span>
+                    </button>
+                </form>
+
+                 <!-- Success/Error Message Area -->
+                <div id="response-message" class="mt-6 hidden text-center p-4 rounded-lg fade-in text-sm"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-950 text-gray-600 py-6 mt-auto border-t border-[var(--border-color)] text-center">
+        <div class="container mx-auto px-6 text-xs">
+            <p>&copy; 2025 SafeLink AI. For demonstration purposes only.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Pre-fill URL ---
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlFromQuery = urlParams.get('url');
+                const reportUrlInput = document.getElementById('report-url');
+                if (urlFromQuery && reportUrlInput) {
+                    reportUrlInput.value = decodeURIComponent(urlFromQuery);
+                }
+            } catch (e) { console.error("Error parsing URL query:", e); }
+
+            // --- Form submission ---
+            const reportForm = document.getElementById('report-form');
+            if (reportForm) {
+                 reportForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    const url = document.getElementById('report-url').value;
+                    const feedback = document.getElementById('report-feedback').value;
+                    const comments = document.getElementById('report-comments').value;
+                    const submitButton = document.getElementById('submit-button');
+                    const buttonText = document.getElementById('button-text');
+                    const spinner = document.getElementById('spinner');
+                    const responseMessage = document.getElementById('response-message');
+
+                    if (!url || !feedback) {
+                        responseMessage.textContent = 'Please fill in the URL and select the type of error.';
+                        responseMessage.className = 'mt-6 p-4 rounded-lg fade-in text-center text-sm bg-red-900/40 text-red-200 border border-red-700/50';
+                        responseMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    buttonText.textContent = 'Submitting...';
+                    spinner.classList.remove('hidden');
+                    submitButton.disabled = true;
+                    responseMessage.classList.add('hidden');
+
+                    fetch('/api/submit_report', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', },
+                        body: JSON.stringify({ url: url, feedback: feedback, comments: comments }),
+                    })
+                    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                    .then(({ status, body }) => {
+                        responseMessage.className = 'mt-6 p-4 rounded-lg fade-in text-center text-sm'; // Base classes
+                        if (status >= 200 && status < 300) {
+                            responseMessage.textContent = body.message || 'Thank you! Your feedback helps improve SafeLink AI.';
+                            responseMessage.classList.add('bg-green-900/40', 'text-green-200', 'border', 'border-green-700/50');
+                            reportForm.reset();
+                            // Optionally clear pre-filled URL too
+                             try { const urlInput = document.getElementById('report-url'); if (urlInput) urlInput.value = ''; } catch(e){}
+                        } else {
+                            responseMessage.textContent = 'Error: ' + (body.error || 'Could not submit report.');
+                            responseMessage.classList.add('bg-red-900/40', 'text-red-200', 'border', 'border-red-700/50');
+                        }
+                        responseMessage.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        responseMessage.textContent = 'A network error occurred. Please check your connection and try again.';
+                        responseMessage.className = 'mt-6 p-4 rounded-lg fade-in text-center text-sm bg-red-900/40 text-red-200 border border-red-700/50';
+                        responseMessage.classList.remove('hidden');
+                        console.error('Fetch Error:', error);
+                    })
+                    .finally(() => {
+                        buttonText.textContent = 'Submit Feedback';
+                        spinner.classList.add('hidden');
+                        submitButton.disabled = false;
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

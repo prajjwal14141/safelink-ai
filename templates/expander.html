@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeLink AI - URL Expander Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styling & Fonts */
+        :root {
+            --bg-primary: #0a0f1f; --bg-secondary: #10172d; --bg-card: rgba(18, 26, 49, 0.6);
+            --border-color: rgba(56, 73, 117, 0.2); --text-primary: #e0e8f9; --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8; --accent-cyan: #2dd4bf; --accent-red: #fb7185; --accent-orange: #fb923c;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary);
+            overscroll-behavior: none;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(rgba(255, 255, 255, 0.03) .5px, transparent .5px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) .5px, transparent .5px);
+            background-size: 1px 1px, 1px 1px, 30px 30px, 30px 30px;
+        }
+        h1, h2, h3, h4, h5, h6, button { font-family: 'Poppins', sans-serif; letter-spacing: -0.02em; }
+        .glass-effect {
+            background: var(--bg-card); backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%); border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .spinner { border-color: rgba(255, 255, 255, 0.3); border-top-color: var(--accent-blue); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.7s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-primary {
+            background: linear-gradient(to right, #0ea5e9, var(--accent-blue)); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); color: white; font-weight: 600;
+        }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(56, 189, 248, 0.3); }
+        .btn-primary:active { transform: translateY(-1px) scale(0.99); box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); }
+        .input-enhanced {
+             background-color: rgba(30, 41, 59, 0.7); border: 1px solid var(--border-color); color: var(--text-primary); transition: all 0.3s ease;
+        }
+        .input-enhanced::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        .input-enhanced:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3); background-color: rgba(30, 41, 59, 0.9); }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        .btn-copy {
+            background-color: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent-blue); transition: all 0.2s ease;
+        }
+        .btn-copy:hover { background-color: rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.5); }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen flex flex-col antialiased">
+
+    <header class="sticky top-0 z-50 glass-effect border-b border-[var(--border-color)] shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+             <a href="/" class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                 <svg class="w-7 h-7 text-[var(--accent-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-[var(--accent-cyan)]">Safe</span>Link <span class="font-light text-gray-400 text-lg">AI</span>
+            </a>
+            <div class="space-x-1 sm:space-x-2">
+                <a href="/" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">Detector</a>
+                <a href="/how-it-works" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">How It Works</a>
+                <a href="/expander" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600/80 hover:bg-blue-600 transition-colors duration-200 shadow">URL Expander</a>
+                <a href="/history" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">History</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-16 sm:py-24 flex-grow">
+        <div class="max-w-2xl mx-auto text-center fade-in">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">URL Expander Tool</h1>
+            <p class="text-base sm:text-lg text-gray-400 mb-10">
+                Uncover the final destination of shortened links before clicking. See where you're really going.
+            </p>
+
+            <!-- Expander Form -->
+            <div class="glass-effect p-6 sm:p-8 rounded-xl shadow-xl mb-10">
+                <form id="expander-form" class="space-y-5">
+                    <label for="url-input" class="sr-only">Short URL to Expand</label>
+                    <input type="text" id="url-input" name="url"
+                           class="input-enhanced w-full px-5 py-3 sm:py-4 rounded-lg text-base sm:text-lg shadow-inner"
+                           placeholder="Paste shortened URL (e.g., bit.ly/xxxx)" required>
+
+                    <button type="submit" id="submit-button"
+                            class="btn-primary w-full flex items-center justify-center px-6 py-3 sm:py-4 rounded-lg text-base sm:text-lg">
+                        <div id="spinner" class="spinner w-5 h-5 border-2 rounded-full mr-3 hidden"></div>
+                        <span id="button-text">Expand URL</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result-section" class="hidden">
+                <!-- Error Message -->
+                <div id="result-error" class="hidden glass-effect bg-red-900/40 border border-red-700/50 text-red-200 px-5 py-4 rounded-lg shadow-lg fade-in mb-8" role="alert">
+                    <div class="flex items-center">
+                         <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                        <div>
+                            <strong class="font-medium">Error:</strong>
+                            <span id="error-message" class="ml-1 text-sm">Something went wrong.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Message -->
+                <div id="result-success" class="hidden glass-effect shadow-xl rounded-lg border border-[var(--border-color)] overflow-hidden fade-in text-left p-6 sm:p-8">
+                    <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 flex items-center">
+                       <svg class="w-6 h-6 mr-2 text-[var(--accent-cyan)] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                       Expansion Result
+                    </h3>
+                    <p class="text-gray-400 text-sm mb-1">This link redirects to:</p>
+                    <div class="relative bg-gray-900/50 rounded-md border border-[var(--border-color)]">
+                         <p id="final-url" class="text-[var(--accent-cyan)] text-sm sm:text-base font-mono break-all p-4 pr-16"></p>
+                         <button id="copy-button" title="Copy Final URL" class="btn-copy absolute top-1/2 right-2 transform -translate-y-1/2 p-2 rounded-md text-xs">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                         </button>
+                    </div>
+                    <p class="text-gray-400 text-xs sm:text-sm mt-4">
+                        Consider analyzing the final URL with our <a href="/" class="text-blue-400 hover:underline">AI Detector</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-950 text-gray-600 py-6 mt-auto border-t border-[var(--border-color)] text-center">
+        <div class="container mx-auto px-6 text-xs">
+            <p>&copy; 2025 SafeLink AI. For demonstration purposes only.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Store button original text
+        const copyButtonOriginalText = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+        const copyButtonSuccessText = `<svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        const copyButtonErrorText = `<svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+
+        document.getElementById('expander-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const url = document.getElementById('url-input').value;
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const spinner = document.getElementById('spinner');
+
+            const resultSection = document.getElementById('result-section');
+            const resultError = document.getElementById('result-error');
+            const resultSuccess = document.getElementById('result-success');
+            const copyButton = document.getElementById('copy-button');
+
+            buttonText.textContent = 'Expanding...';
+            spinner.classList.remove('hidden');
+            submitButton.disabled = true;
+            resultSection.classList.add('hidden');
+            resultError.classList.add('hidden');
+            resultSuccess.classList.add('hidden');
+            copyButton.innerHTML = copyButtonOriginalText; // Reset copy button icon
+
+            fetch('/api/expand', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', },
+                body: JSON.stringify({ url: url }),
+            })
+            .then(response => {
+                if (!response.ok) { return response.json().then(errData => { throw new Error(errData.error || `HTTP error! status: ${response.status}`) }); }
+                return response.json();
+             })
+            .then(data => {
+                resultSection.classList.remove('hidden');
+                if (data.error) { throw new Error(data.error); }
+
+                const finalUrlElement = document.getElementById('final-url');
+                finalUrlElement.textContent = data.final_url;
+                resultSuccess.classList.remove('hidden');
+
+                // Setup copy button
+                copyButton.onclick = () => {
+                   try {
+                         // Use Clipboard API first
+                         if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(data.final_url).then(() => {
+                                copyButton.innerHTML = copyButtonSuccessText;
+                                setTimeout(() => { copyButton.innerHTML = copyButtonOriginalText; }, 2000);
+                            }).catch(err => {
+                                console.error('Async Clipboard API failed: ', err);
+                                throw new Error('Clipboard API failed'); // Fallback needed
+                            });
+                         } else {
+                              throw new Error('Clipboard API not available'); // Fallback needed
+                         }
+                    } catch (err) {
+                        // Fallback using document.execCommand
+                        console.warn("Using fallback copy method.");
+                        const textArea = document.createElement("textarea");
+                        textArea.value = data.final_url;
+                        textArea.style.position = "fixed"; textArea.style.opacity = "0";
+                        document.body.appendChild(textArea);
+                        textArea.focus(); textArea.select();
+                        try {
+                            const successful = document.execCommand('copy');
+                            if (!successful) throw new Error('execCommand failed');
+                            copyButton.innerHTML = copyButtonSuccessText;
+                            setTimeout(() => { copyButton.innerHTML = copyButtonOriginalText; }, 2000);
+                        } catch (execErr) {
+                            console.error('Fallback execCommand failed: ', execErr);
+                            copyButton.innerHTML = copyButtonErrorText;
+                            setTimeout(() => { copyButton.innerHTML = copyButtonOriginalText; }, 2000);
+                        } finally {
+                            document.body.removeChild(textArea);
+                        }
+                    }
+                };
+            })
+            .catch(error => {
+                resultSection.classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message || 'An error occurred.';
+                resultError.classList.remove('hidden');
+                console.error('Fetch Error:', error);
+            })
+            .finally(() => {
+                buttonText.textContent = 'Expand URL';
+                spinner.classList.add('hidden');
+                submitButton.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

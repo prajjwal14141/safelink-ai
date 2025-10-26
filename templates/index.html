@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeLink AI - Advanced URL Security Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styling & Fonts */
+        :root {
+            --bg-primary: #0a0f1f; /* Even darker navy */
+            --bg-secondary: #10172d;
+            --bg-card: rgba(18, 26, 49, 0.6); /* Card glass bg */
+            --border-color: rgba(56, 73, 117, 0.2); /* Subtle border */
+            --text-primary: #e0e8f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8; /* Light blue */
+            --accent-cyan: #2dd4bf; /* Teal/Cyan */
+            --accent-red: #fb7185; /* Soft red */
+            --accent-orange: #fb923c; /* Orange */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overscroll-behavior: none; /* Prevent pull-to-refresh */
+        }
+        h1, h2, h3, h4, h5, h6, button {
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* Aurora Background Effect */
+        .aurora-background {
+            position: relative;
+            background: var(--bg-secondary);
+            overflow: hidden;
+            isolation: isolate; /* Create new stacking context */
+        }
+        .aurora-background::before,
+        .aurora-background::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 60vmax; /* Larger shapes */
+            height: 60vmax;
+            border-radius: 50%;
+            filter: blur(100px); /* Significant blur */
+            mix-blend-mode: screen; /* Blend nicely on dark */
+            will-change: transform; /* Optimize animation */
+        }
+        .aurora-background::before {
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.3) 0%, rgba(56, 189, 248, 0) 70%);
+            top: -20%;
+            left: -15%;
+            animation: aurora-float1 25s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+        }
+        .aurora-background::after {
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.2) 0%, rgba(45, 212, 191, 0) 70%);
+            bottom: -25%;
+            right: -20%;
+            animation: aurora-float2 30s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+            animation-delay: -5s; /* Offset animation */
+        }
+        @keyframes aurora-float1 {
+            0% { transform: translate(0%, 0%) rotate(0deg); }
+            100% { transform: translate(10%, 15%) rotate(10deg); }
+        }
+        @keyframes aurora-float2 {
+            0% { transform: translate(0%, 0%) rotate(0deg); }
+            100% { transform: translate(-15%, -10%) rotate(-15deg); }
+        }
+
+        /* Glassmorphism Effect Refined */
+        .glass-effect {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Spinner */
+        .spinner {
+            border-color: rgba(255, 255, 255, 0.3);
+            border-top-color: var(--accent-blue);
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Fade-in Animation */
+        .fade-in { animation: fadeIn 0.7s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Enhanced Button */
+        .btn-primary {
+            background: linear-gradient(to right, #0ea5e9, var(--accent-blue)); /* Sky to Light Blue */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+            color: white;
+            font-weight: 600;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(-1px) scale(0.99);
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Enhanced Input */
+        .input-enhanced {
+             background-color: rgba(30, 41, 59, 0.7); /* Slightly transparent */
+             border: 1px solid var(--border-color);
+             color: var(--text-primary);
+             transition: all 0.3s ease;
+        }
+        .input-enhanced::placeholder { color: var(--text-secondary); opacity: 0.6; }
+        .input-enhanced:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3);
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        /* Skeleton Loading Styles Refined */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(55, 65, 81, 0.5) 25%, rgba(55, 65, 81, 0.7) 50%, rgba(55, 65, 81, 0.5) 75%);
+            background-size: 200% 100%;
+            border-radius: 0.375rem; /* rounded-md */
+            animation: pulse-shine 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-shine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Scrollbar Styling (Optional, but nice) */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen flex flex-col antialiased">
+
+    <header class="sticky top-0 z-50 glass-effect border-b border-[var(--border-color)] shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                 <svg class="w-7 h-7 text-[var(--accent-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-[var(--accent-cyan)]">Safe</span>Link <span class="font-light text-gray-400 text-lg">AI</span>
+            </a>
+            <div class="space-x-1 sm:space-x-2">
+                <a href="/" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600/80 hover:bg-blue-600 transition-colors duration-200 shadow">Detector</a>
+                <a href="/how-it-works" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">How It Works</a>
+                <a href="/expander" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">URL Expander</a>
+                <a href="/history" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">History</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="aurora-background text-white py-20 sm:py-28 md:py-36">
+        <div class="container mx-auto px-4 sm:px-6 text-center relative z-10">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-5 tracking-tight animate-fade-in" style="animation-delay: 0.1s;">
+                Secure Your Clicks with <span class="text-[var(--accent-cyan)]">AI Analysis</span>
+            </h1>
+            <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-10 max-w-3xl mx-auto animate-fade-in" style="animation-delay: 0.3s;">
+                Instantly scan URLs for phishing, malware, and other threats using our advanced AI. Browse smarter, stay safer.
+            </p>
+
+            <div class="max-w-xl mx-auto glass-effect p-6 sm:p-8 rounded-xl shadow-xl animate-fade-in" style="animation-delay: 0.5s;">
+                <form id="url-form" class="space-y-5">
+                    <label for="url-input" class="sr-only">URL to Analyze</label>
+                    <input type="text" id="url-input" name="url"
+                           class="input-enhanced w-full px-5 py-3 sm:py-4 rounded-lg text-base sm:text-lg shadow-inner"
+                           placeholder="Paste URL here (e.g., https://example.com)" required>
+
+                    <button type="submit" id="submit-button"
+                            class="btn-primary w-full flex items-center justify-center px-6 py-3 sm:py-4 rounded-lg text-base sm:text-lg">
+                        <div id="spinner" class="spinner w-5 h-5 border-2 rounded-full mr-3 hidden"></div>
+                        <span id="button-text">Scan URL Now</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analysis Result Section -->
+    <section id="result-section" class="container mx-auto px-4 sm:px-6 py-12 sm:py-16 hidden">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center text-white mb-8 sm:mb-10">Analysis Result</h2>
+
+            <!-- Skeleton Loader -->
+            <div id="skeleton-loader" class="hidden glass-effect rounded-lg p-6 sm:p-8 space-y-6">
+                 <div class="flex items-center space-x-4">
+                     <div class="skeleton w-12 h-12 sm:w-16 sm:h-16 rounded-full flex-shrink-0"></div>
+                     <div class="flex-1 space-y-3">
+                         <div class="skeleton h-7 w-1/2"></div>
+                         <div class="skeleton h-4 w-full"></div>
+                     </div>
+                 </div>
+                 <div class="bg-gray-700/30 p-4 sm:p-5 rounded-lg border border-[var(--border-color)] space-y-4">
+                      <div class="skeleton h-5 w-1/3"></div>
+                      <div class="skeleton h-5 w-3/4"></div>
+                      <div class="skeleton h-5 w-5/6"></div>
+                 </div>
+                 <div class="skeleton h-4 w-full mt-5"></div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="result-error" class="hidden glass-effect bg-red-900/40 border border-red-700/50 text-red-200 px-5 py-4 rounded-lg shadow-lg fade-in" role="alert">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <div>
+                        <strong class="font-medium">Error:</strong>
+                        <span id="error-message" class="ml-1 text-sm">Something went wrong.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Result Card (Dynamic) -->
+            <div id="result-card" class="hidden glass-effect shadow-xl rounded-lg border-2 overflow-hidden fade-in">
+                <div class="p-6 sm:p-8">
+                    <!-- Overall Verdict -->
+                    <div id="verdict-header" class="flex items-center mb-6">
+                        <svg id="verdict-icon" class="w-12 h-12 sm:w-16 sm:h-16 mr-4 sm:mr-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"></svg>
+                        <div class="flex-1 min-w-0"> {/* Allow truncation */}
+                            <h3 id="verdict-title" class="text-2xl sm:text-3xl font-bold leading-tight"></h3>
+                            <p class="text-gray-400 text-xs sm:text-sm break-all mt-1 truncate" id="result-url" title="Full URL"></p>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Details -->
+                    <div class="bg-gray-700/30 p-4 sm:p-5 rounded-lg border border-[var(--border-color)]">
+                        <h4 class="font-semibold text-white mb-3 text-base sm:text-lg border-b border-gray-600/50 pb-2">Analysis Details</h4>
+                        <div class="space-y-2">
+                            <!-- Our AI Result -->
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-300">SafeLink AI Prediction:</span>
+                                <span id="ai-prediction-text" class="font-semibold px-2.5 py-0.5 rounded-full text-xs"></span>
+                            </div>
+                            <!-- Entropy Result -->
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-300">Entropy Score:</span>
+                                <span id="result-entropy" class="font-mono text-base text-[var(--accent-cyan)]"></span>
+                            </div>
+                        </div>
+
+                        <!-- Threat Report Section -->
+                        <div id="threat-report-container" class="hidden mt-4 pt-3 border-t border-gray-600/50">
+                             <h5 class="font-semibold text-[var(--accent-orange)] mb-2 text-sm flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                                Threat Report:
+                            </h5>
+                             <ul id="threat-report-list" class="text-orange-200/90 text-xs space-y-1.5 mt-1 pl-1">
+                                <!-- Reasons will be added here by JS with icons -->
+                             </ul>
+                        </div>
+
+                        <a href="/how-it-works#entropy" class="text-blue-400 hover:underline text-[11px] mt-3 inline-block opacity-80 hover:opacity-100">Learn about factors</a>
+                    </div>
+                    <p id="verdict-message" class="mt-5 text-xs sm:text-sm"></p>
+                    <div class="mt-5 text-center">
+                        <a id="report-link" href="#" class="text-[11px] text-blue-400/80 hover:text-blue-300 hover:underline hidden">
+                            Think this prediction is wrong? Report it.
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section - Enhanced -->
+    <section class="bg-gray-950 text-white py-16 sm:py-20 border-t border-[var(--border-color)]">
+         <div class="container mx-auto px-4 sm:px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">How SafeLink AI Works</h2>
+            <p class="text-base md:text-lg text-gray-400 max-w-3xl mx-auto mb-12">
+                Leveraging machine learning to dissect URLs and identify potential threats.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-left">
+                <!-- Card 1 -->
+                <div class="glass-effect p-6 rounded-lg shadow-lg hover:shadow-blue-500/10 transition-shadow duration-300 border border-transparent hover:border-blue-500/30">
+                    <svg class="w-10 h-10 text-blue-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <h3 class="text-lg font-semibold mb-2">Lexical Analysis</h3>
+                    <p class="text-gray-300 text-sm">Identifies suspicious keywords, character patterns, and domain structures learned from vast datasets.</p>
+                </div>
+                 <!-- Card 2 -->
+                <div class="glass-effect p-6 rounded-lg shadow-lg hover:shadow-cyan-500/10 transition-shadow duration-300 border border-transparent hover:border-cyan-500/30">
+                     <svg class="w-10 h-10 text-cyan-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6a2 2 0 00-2-2H5a2 2 0 00-2 2v13m11 0V6a2 2 0 012-2h2a2 2 0 012 2v13m-17 0h18a2 2 0 002-2V5a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <h3 class="text-lg font-semibold mb-2">Entropy Scoring</h3>
+                    <p class="text-gray-300 text-sm">Quantifies URL randomness. Unusually high scores often indicate algorithmically generated malicious links.</p>
+                </div>
+                 <!-- Card 3 -->
+                <div class="glass-effect p-6 rounded-lg shadow-lg hover:shadow-purple-500/10 transition-shadow duration-300 border border-transparent hover:border-purple-500/30">
+                     <svg class="w-10 h-10 text-purple-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <h3 class="text-lg font-semibold mb-2">ML Classification</h3>
+                    <p class="text-gray-300 text-sm">A Logistic Regression model analyzes extracted features to provide a final risk assessment.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-950 text-gray-600 py-6 mt-auto border-t border-[var(--border-color)] text-center">
+        <div class="container mx-auto px-6 text-xs">
+            <p>&copy; 2025 SafeLink AI. For demonstration purposes only.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Icons for Threat Report
+        const warningIconSVG = `<svg class="w-3.5 h-3.5 mr-1.5 inline-block text-[var(--accent-orange)] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>`;
+
+        document.getElementById('url-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const url = document.getElementById('url-input').value;
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const spinner = document.getElementById('spinner');
+
+            const resultSection = document.getElementById('result-section');
+            const resultError = document.getElementById('result-error');
+            const resultCard = document.getElementById('result-card');
+            const skeletonLoader = document.getElementById('skeleton-loader');
+            const reportLink = document.getElementById('report-link');
+
+            // --- Show loading state ---
+            buttonText.textContent = 'Analyzing...';
+            spinner.classList.remove('hidden');
+            submitButton.disabled = true;
+            resultSection.classList.remove('hidden');
+            resultError.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            skeletonLoader.classList.remove('hidden');
+            reportLink.classList.add('hidden');
+
+            // Simulate slight delay for better UX with skeleton
+            setTimeout(() => {
+                fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url }),
+                })
+                .then(response => {
+                    if (!response.ok) { return response.json().then(errData => { throw new Error(errData.error || `HTTP error! status: ${response.status}`) }); }
+                    return response.json();
+                })
+                .then(data => {
+                    skeletonLoader.classList.add('hidden');
+                    resultCard.classList.remove('hidden');
+                    resultCard.classList.remove('border-cyan-500', 'border-orange-500');
+
+                    if (data.error) { throw new Error(data.error); } // Rethrow error for catch block
+
+                    // --- Populate ---
+                    document.getElementById('result-url').textContent = data.url;
+                    document.getElementById('result-url').title = data.url;
+                    document.getElementById('result-entropy').textContent = data.entropy;
+
+                    const aiText = document.getElementById('ai-prediction-text');
+                    aiText.textContent = data.ai_prediction === 'good' ? 'Safe' : 'Malicious';
+                    aiText.className = data.ai_prediction === 'good'
+                        ? 'font-semibold text-xs px-2.5 py-0.5 rounded-full bg-green-600/30 text-green-300 border border-green-500/30'
+                        : 'font-semibold text-xs px-2.5 py-0.5 rounded-full bg-red-600/30 text-red-300 border border-red-500/30';
+
+                    const verdictIcon = document.getElementById('verdict-icon');
+                    const verdictTitle = document.getElementById('verdict-title');
+                    const verdictMessage = document.getElementById('verdict-message');
+                    const threatReportContainer = document.getElementById('threat-report-container');
+                    const threatReportList = document.getElementById('threat-report-list');
+                    threatReportContainer.classList.add('hidden');
+                    threatReportList.innerHTML = '';
+
+                    if (data.is_malicious) {
+                        resultCard.classList.add('border-orange-500');
+                        verdictIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>`;
+                        verdictIcon.className = 'w-12 h-12 sm:w-16 sm:h-16 mr-4 sm:mr-5 flex-shrink-0 text-[var(--accent-orange)]';
+                        verdictTitle.textContent = 'Potentially Malicious';
+                        verdictTitle.className = 'text-2xl sm:text-3xl font-bold leading-tight text-[var(--accent-orange)]';
+                        verdictMessage.textContent = 'Our AI model suggests this URL might be unsafe. Exercise extreme caution.';
+                        verdictMessage.className = 'mt-5 text-xs sm:text-sm font-medium text-orange-200/90';
+
+                        if (data.threat_report && data.threat_report.length > 0) {
+                            data.threat_report.forEach(reason => {
+                                const li = document.createElement('li');
+                                li.className = 'flex items-start';
+                                li.innerHTML = `${warningIconSVG} <span>${reason}</span>`;
+                                threatReportList.appendChild(li);
+                            });
+                            threatReportContainer.classList.remove('hidden');
+                        }
+
+                    } else { // Safe
+                        resultCard.classList.add('border-cyan-500');
+                        verdictIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                        verdictIcon.className = 'w-12 h-12 sm:w-16 sm:h-16 mr-4 sm:mr-5 flex-shrink-0 text-[var(--accent-cyan)]';
+                        verdictTitle.textContent = 'Likely Safe';
+                        verdictTitle.className = 'text-2xl sm:text-3xl font-bold leading-tight text-[var(--accent-cyan)]';
+                        verdictMessage.textContent = 'Our AI model indicates this URL appears safe. Always remain vigilant online.';
+                        verdictMessage.className = 'mt-5 text-xs sm:text-sm text-gray-400';
+                    }
+
+                     if (reportLink) {
+                        const encodedUrl = encodeURIComponent(data.url);
+                        reportLink.href = `/report?url=${encodedUrl}`;
+                        reportLink.classList.remove('hidden');
+                    }
+
+                    // Save to history (keep this logic)
+                    try {
+                        const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+                        const newEntry = { url: data.url, prediction: data.ai_prediction, is_malicious: data.is_malicious, timestamp: new Date().toISOString() };
+                        history.unshift(newEntry);
+                        const trimmedHistory = history.slice(0, 20);
+                        localStorage.setItem('analysisHistory', JSON.stringify(trimmedHistory));
+                    } catch (e) { console.error("Failed to save history:", e); }
+
+                })
+                .catch(error => {
+                    skeletonLoader.classList.add('hidden');
+                    resultCard.classList.add('hidden');
+                    document.getElementById('error-message').textContent = error.message || 'A network error occurred.';
+                    resultError.classList.remove('hidden');
+                    reportLink.classList.add('hidden');
+                    console.error('Fetch Error:', error);
+                })
+                .finally(() => {
+                    buttonText.textContent = 'Scan URL Now';
+                    spinner.classList.add('hidden');
+                    submitButton.disabled = false;
+                });
+            }, 300); // Simulate network delay
+        });
+    </script>
+</body>
+</html>
+

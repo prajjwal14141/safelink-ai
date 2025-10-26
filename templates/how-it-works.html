@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeLink AI - How It Works</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styling & Fonts */
+        :root { /* Using variables from index.html */
+            --bg-primary: #0a0f1f; --bg-secondary: #10172d; --bg-card: rgba(18, 26, 49, 0.6);
+            --border-color: rgba(56, 73, 117, 0.2); --text-primary: #e0e8f9; --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8; --accent-cyan: #2dd4bf; --accent-red: #fb7185; --accent-orange: #fb923c;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary);
+            overscroll-behavior: none;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(rgba(255, 255, 255, 0.03) .5px, transparent .5px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) .5px, transparent .5px);
+            background-size: 1px 1px, 1px 1px, 30px 30px, 30px 30px;
+        }
+        h1, h2, h3, h4, h5, h6, button { font-family: 'Poppins', sans-serif; letter-spacing: -0.02em; }
+        .glass-effect {
+            background: var(--bg-card); backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%); border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in { animation: fadeIn 0.7s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+        /* Prose Styling Overrides for Dark Theme */
+        .prose-custom { color: var(--text-secondary); line-height: 1.7; }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3, .prose-custom h4, .prose-custom strong { color: var(--text-primary); }
+        .prose-custom h2 { font-size: 1.75em; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        .prose-custom h3 { font-size: 1.35em; color: var(--accent-cyan); }
+        .prose-custom code { background-color: rgba(56, 189, 248, 0.1); color: var(--accent-blue); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.85em; font-family: 'Courier New', Courier, monospace; word-wrap: break-word; }
+        .prose-custom ul { padding-left: 1.25rem; }
+        .prose-custom ul > li { margin-bottom: 0.5rem; }
+        .prose-custom ul > li::marker { color: var(--accent-blue); font-size: 1.1em; }
+        .prose-custom a { color: var(--accent-cyan); text-decoration: none; transition: color 0.2s ease, text-decoration 0.2s ease; border-bottom: 1px solid transparent; }
+        .prose-custom a:hover { color: lighten(var(--accent-cyan), 10%); border-bottom-color: var(--accent-cyan); }
+        .prose-custom blockquote { border-left-color: var(--accent-blue); color: var(--text-secondary); background-color: rgba(18, 26, 49, 0.4); padding: 0.5rem 1rem; border-radius: 4px; }
+
+        .feature-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen flex flex-col antialiased">
+
+    <header class="sticky top-0 z-50 glass-effect border-b border-[var(--border-color)] shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+             <a href="/" class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                 <svg class="w-7 h-7 text-[var(--accent-blue)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-[var(--accent-cyan)]">Safe</span>Link <span class="font-light text-gray-400 text-lg">AI</span>
+            </a>
+            <div class="space-x-1 sm:space-x-2">
+                <a href="/" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">Detector</a>
+                <a href="/how-it-works" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-white bg-blue-600/80 hover:bg-blue-600 transition-colors duration-200 shadow">How It Works</a>
+                <a href="/expander" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">URL Expander</a>
+                <a href="/history" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-md text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors duration-200">History</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-16 sm:py-24 flex-grow">
+        <div class="glass-effect shadow-xl rounded-lg overflow-hidden p-8 sm:p-12 max-w-4xl mx-auto fade-in">
+
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-6 border-b border-[var(--border-color)] pb-4">Behind the AI: How We Scan URLs</h1>
+
+            <article class="prose-custom prose sm:prose-lg max-w-none space-y-6">
+                <p>SafeLink AI employs a sophisticated Machine Learning pipeline, trained on a massive dataset of over one million URLs, to distinguish safe links from malicious ones. This process involves several key steps:</p>
+
+                <h2 class="text-2xl font-semibold text-white pt-4 !mb-3">1. URL Normalization</h2>
+                <p>Before analysis, every submitted URL undergoes a standardization process. This "cleaning" removes parts that are generally uninformative for risk assessment, ensuring the AI focuses on the core components:</p>
+                <ul class="list-disc text-sm sm:text-base space-y-1.5">
+                    <li>Protocols like <code>http://</code> and <code>https://</code> are removed.</li>
+                    <li>Common prefixes such as <code>www.</code> are stripped away.</li>
+                    <li>Any trailing slashes (<code>/</code>) at the end of the URL are eliminated.</li>
+                    <li><strong>Example:</strong> The URL <code>https://www.dangerous-site.com/login/</code> is normalized to <code>dangerous-site.com/login</code>.</li>
+                </ul>
+
+                <h2 class="text-2xl font-semibold text-white pt-6 !mb-3">2. Feature Engineering</h2>
+                <p>The normalized URL is then dissected to extract meaningful "features" – the specific characteristics the AI model uses to make its judgment:</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="glass-effect bg-gray-900/30 p-5 rounded-lg border border-[var(--border-color)] feature-card">
+                         <h3 class="text-lg font-semibold text-[var(--accent-cyan)] !mb-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
+                            Lexical Tokens
+                         </h3>
+                        <p class="text-sm">The URL is segmented into constituent "words" (tokens) using delimiters like <code>/</code>, <code>-</code>, and <code>.</code>. Common, low-value tokens (<code>com</code>, <code>org</code>) are filtered out. The AI learns which tokens are statistically associated with malicious versus benign URLs.</p>
+                        <p class="text-xs text-gray-500 mt-3 italic">Example: <code>free-prize.tk/login.php</code> → <code>['free', 'prize', 'tk', 'login', 'php']</code></p>
+                    </div>
+
+                     <div class="glass-effect bg-gray-900/30 p-5 rounded-lg border border-[var(--border-color)] feature-card">
+                        <h3 id="entropy" class="text-lg font-semibold text-[var(--accent-cyan)] !mb-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Shannon Entropy
+                        </h3>
+                        <p class="text-sm">We calculate the URL's entropy, quantifying its character-level randomness. Malicious URLs often exhibit high entropy due to auto-generated strings designed to evade simple blacklist filters.</p>
+                         <p class="text-xs text-gray-500 mt-3 italic">Higher score = more random (e.g., <code>x3zr9.xyz</code>). Lower score = simpler (e.g., <code>google.com</code>).</p>
+                    </div>
+                </div>
+
+
+                <h2 class="text-2xl font-semibold text-white pt-6 !mb-3">3. Machine Learning Classification</h2>
+                <p>The core of SafeLink AI is a <strong>Logistic Regression</strong> model. This algorithm takes the extracted features (token presence/absence, entropy score) as input. During training, it learned the optimal "weights" or importance for each feature based on the large dataset.</p>
+                <p>When analyzing a new URL, the model combines the weighted features to compute a probability score indicating the likelihood of the URL being malicious. Based on a predefined threshold, it outputs the final classification: <strong>Safe</strong> or <strong>Malicious</strong>.</p>
+                <blockquote>
+                    <p class="text-sm">Importantly, the model considers all features together. A single suspicious token or high entropy might not be enough to flag a URL if other features strongly indicate it's safe. It's the combined pattern that matters.</p>
+                </blockquote>
+
+                <div class="text-center pt-8">
+                     <a href="/" class="inline-block px-6 py-3 text-white font-medium bg-blue-600 rounded-md hover:bg-blue-500 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                         Scan a URL Now
+                     </a>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+     <footer class="bg-gray-950 text-gray-600 py-6 mt-auto border-t border-[var(--border-color)] text-center">
+        <div class="container mx-auto px-6 text-xs">
+            <p>&copy; 2025 SafeLink AI. For demonstration purposes only.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

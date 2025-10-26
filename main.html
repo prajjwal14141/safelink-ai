@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malicious Link Detector</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+    background-color: #f0f4f8; /* Light blue background */
+    font-family: 'Arial', sans-serif;
+}
+
+header {
+    background-color: #1e40af; /* Deep blue */
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+header h3 {
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+    font-family: cursive;
+}
+
+.info-section {
+    margin: 3rem 1rem;
+    padding: 1.5rem;
+    background-color: #e0f2fe; /* Light blue */
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.info-section p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: large;
+}
+
+.info-section-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin: 3rem 1rem;
+    font-size: large;
+}
+
+.image-container img {
+    max-height: 75%;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+}
+
+.main-container {
+    padding: 1.5rem;
+    margin: 3rem 3rem;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.accordion-header {
+    background-color: #bfdbfe; /* Soft blue */
+    border: 1px solid #93c5fd; /* Light blue border */
+    padding: 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.accordion-header:hover {
+    background-color: #93c5fd; /* Hover color */
+    transform: scale(1.05);
+}
+
+.accordion-panel {
+    display: none;
+    padding: 1rem;
+    border-top: 1px solid #dbeafe;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+}
+
+.accordion-panel p {
+    margin: 0.5rem 0;
+}
+
+.accordion-header[aria-expanded="true"] + .accordion-panel {
+    display: block;
+}
+
+.button-primary {
+    background-color: #1e40af; /* Deep blue */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.button-primary:hover {
+    background-color: #1e3a8a; /* Darker blue */
+    transform: scale(1.05);
+}
+
+.grid > div {
+    transition: transform 0.3s;
+}
+
+.grid > div:hover {
+    transform: scale(1.05);
+}
+footer{
+    background-color:darkblue;
+    text-align: center;
+    color: white;
+    font-size: large;
+    font-family: cursive;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="one">MALICIOUS LINK DETECTOR</h1>
+        <h3 id="two">TO SECURE YOU BY DETECTING ALL YOUR MALICIOUS LINKS!!</h3>
+    </header>
+    <main>
+        <section class="info-section">
+            <p>
+                A 'malicious link' refers to a hyperlink that is intentionally designed to redirect users to a harmful website controlled by an attacker. It is a URL that, when accessed, directs the person to a website or web page designed by criminals to cause damage to devices or steal information. These links are often used in phishing attacks, where criminals try to trick their victims into providing data, such as passwords, financial information, or personal details.
+            </p>
+        </section>
+        <section class="info-section-container">
+            <div class="flex-1">
+                <p>These links can come through a variety of channels, such as:</p>
+                <ul class="list-disc ml-5 mt-2">
+                    <li>Email</li>
+                    <li>SMS</li>
+                    <li>Social media</li>
+                    <li>Chat apps</li>
+                </ul>
+                <p class="mt-4">In this way, victims are taken to fake websites that pose as legitimate, such as banks, online stores, or services. Their goal is to trick people into giving up their information.</p>
+            </div>
+            <div class="image-container flex-1">
+                <img src="PHISHING.webp" alt="Phishing Example">
+            </div>
+        </section>
+        <div class="main-container">
+            <input type="url" id="urlInput" placeholder="Enter a URL to check" class="p-2 border border-blue-400 rounded-md w-full max-w-md mb-2" required>
+            <button onclick="checkURL()" class="button-primary">Check URL</button>
+            <div id="result" class="mt-4"></div>
+            <br>
+            <p><centre><i>By entering a URL you agree to our terms of service and privacy policy.</i></centre></p>
+        </div>
+        <section id="url-safety-check" class="py-16 bg-white shadow-lg rounded-lg mx-4 sm:mx-8">
+            <div class="container mx-auto px-4 sm:px-8">
+                <div class="text-center mb-10">
+                    <h3 class="text-3xl font-bold text-gray-800">How can I check if a URL is safe?</h3>
+                    <p class="mt-4 text-gray-600">If you come across a link that you want to visit but it seems suspicious, simply use Link Checker to quickly scan the URL and know whether it’s safe to enter the website.</p>
+                </div>
+                <div class="grid md:grid-cols-3 grid-cols-1 gap-8">
+                    <div class="bg-blue-50 shadow-lg rounded-lg border border-blue-200 p-6 transform hover:scale-105 transition-transform duration-300">
+                        <p class="text-xl font-bold text-blue-600">01</p>
+                        <p class="mt-2 text-gray-700">Enter your link.</p>
+                    </div>
+                    <div class="bg-blue-100 shadow-lg rounded-lg border border-blue-300 p-6 transform hover:scale-105 transition-transform duration-300">
+                        <p class="text-xl font-bold text-blue-600">02</p>
+                        <p class="mt-2 text-gray-700">Wait for a few moments.</p>
+                    </div>
+                    <div class="bg-blue-200 shadow-lg rounded-lg border border-blue-400 p-6 transform hover:scale-105 transition-transform duration-300">
+                        <p class="text-xl font-bold text-blue-600">03</p>
+                        <p class="mt-2 text-gray-700">See the results.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md mt-8">
+            <h2 class="text-3xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
+            <div class="mb-4">
+                <h3 class="accordion-header" aria-expanded="false" id="q1">How can you identify a suspicious URL?</h3>
+                <div class="accordion-panel">
+                    <p>It’s very difficult to determine if a website will be dangerous just by looking at the URL, especially if it’s hidden under a URL shortener. You can, however, look for typos or changed letters if it’s a well-known domain. For example, if you see arnazon.com, it’s a dead giveaway that someone is trying to scam you with a fake Amazon website.</p>
+                    <p class="mt-2">If you want to be sure, use a free URL checker like Link Checker or a paid services that offers this feature.</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="accordion-header" aria-expanded="false" id="q2">What happens if you click on a malicious link?</h3>
+                <div class="accordion-panel">
+                    <p>There’s a chance that nothing will happen — you will immediately see that it’s a suspicious website and leave. But it could also lead to data theft (phishing campaigns are designed to steal credit card info, login details, and other personal information) or malware installed on your device. A drive-by download could inject your device with malware that encrypts your data, showers you with ads, or steals your passwords.</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="accordion-header" aria-expanded="false" id="q3">Will Link Checker scan the entire website at once?</h3>
+                <div class="accordion-panel">
+                    <p>No, Link Checker will only scan the specific URL you’ve entered, not the entire domain.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <a href="aboutus.html" >ABOUT US!!</a>
+       
+    </footer>
+</body>
+</html>
