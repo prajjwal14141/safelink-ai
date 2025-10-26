@@ -100,24 +100,78 @@ def entropy(s):
     return -sum(count / lns * math.log(count / lns, 2) for count in p.values())
 
 # --- 6. Load Pre-trained Model and Vectorizer ---
-# Note: In a serverless environment, this happens during the cold start.
-# Ensure model.pkl and vectorizer.pkl are included in the deployment.
+MODEL_URL = "https://github.com/prajjwal14141/safelink-ai/releases/download/v1.0.0/model.pkl"
+VECTORIZER_URL = "https://github.com/prajjwal14141/safelink-ai/releases/download/v1.0.0/vectorizer.pkl"
+MODEL_PATH = "/tmp/model.pkl"
+VECTORIZER_PATH = "/tmp/vectorizer.pkl"
+
+vectorizer = None
+lgs = None
+
+# --- Function to download a file ---
+def download_file(url, destination):
+    print(f"Downloading {os.path.basename(destination)} from {url}...")
+    try:
+        # Use User-Agent to avoid potential blocks from GitHub/CDNs
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        with requests.get(url, stream=True, timeout=90, headers=headers) as r: # Increased timeout further
+            r.raise_for_status() # Will raise an HTTPError for bad responses (4xx or 5xx)
+            with open(destination, 'wb') as f:
+                downloaded_size = 0
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    downloaded_size += len(chunk)
+        print(f"{os.path.basename(destination)} downloaded successfully ({downloaded_size / (1024*1024):.2f} MB).")
+        return True
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading {os.path.basename(destination)}: {e}")
+        # Attempt to delete partial file if download failed
+        if os.path.exists(destination):
+            try: os.remove(destination)
+            except OSError: pass # Ignore error if file cannot be deleted
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred during download of {os.path.basename(destination)}: {e}")
+        if os.path.exists(destination):
+            try: os.remove(destination)
+            except OSError: pass
+        return False
+
+# --- Load or Download Logic ---
 try:
-    # Assuming these files are in the same directory as AIserver.py
-    vectorizer_path = os.path.join(os.path.dirname(__file__), 'vectorizer.pkl')
-    model_path = os.path.join(os.path.dirname(__file__), 'model.pkl')
-    vectorizer = joblib.load(vectorizer_path)
-    lgs = joblib.load(model_path)
-    print("Model and vectorizer loaded successfully.")
-except FileNotFoundError:
-    print("FATAL ERROR: 'vectorizer.pkl' or 'model.pkl' not found in deployment package.")
+    # Check if files already exist in /tmp (for warm starts)
+    model_exists = os.path.exists(MODEL_PATH)
+    vectorizer_exists = os.path.exists(VECTORIZER_PATH)
+
+    # Download Vectorizer if missing
+    if not vectorizer_exists:
+        if not download_file(VECTORIZER_URL, VECTORIZER_PATH):
+             raise RuntimeError(f"Failed to download vectorizer from {VECTORIZER_URL}")
+    print("Loading vectorizer...")
+    vectorizer = joblib.load(VECTORIZER_PATH)
+
+    # Download Model if missing
+    if not model_exists:
+         if not download_file(MODEL_URL, MODEL_PATH):
+             raise RuntimeError(f"Failed to download model from {MODEL_URL}")
+    print("Loading model...")
+    lgs = joblib.load(MODEL_PATH)
+
+    if vectorizer and lgs:
+         print("Model and vectorizer ready.")
+    else:
+         # This case should ideally be caught by exceptions during download/load
+         raise RuntimeError("Model or vectorizer failed to load after download attempt.")
+
+except RuntimeError as e: # Catch specific download/load failures
+    print(f"FATAL ERROR during model setup: {e}")
     vectorizer = None
     lgs = None
 except Exception as e:
-    print(f"Error loading models: {e}")
+    # Catch any other unexpected errors during the process
+    print(f"FATAL ERROR loading/downloading models: {e}")
     vectorizer = None
     lgs = None
-
 # --- 7. Define App Routes ---
 
 @app.route('/')
