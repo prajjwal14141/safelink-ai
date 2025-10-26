@@ -7,3 +7,5 @@ Flask
 flask-cors
 requests
 firebase-admin
+json
+gunicorn
