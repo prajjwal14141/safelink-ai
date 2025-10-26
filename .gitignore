@@ -1,4 +1,14 @@
+# Ignore Python virtual environment
 venv/
+
+# Ignore Python cache files
 *.pyc
 __pycache__/
+
+# Ignore sensitive Firebase key
 serviceAccountKey.json
+
+# Ignore large training data (not needed for deployment)
+data/  # <-- ADD THIS LINE
+
+.vscode/
